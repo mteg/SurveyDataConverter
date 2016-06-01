@@ -20,7 +20,7 @@ __license__ = 'MIT'
 
 __description__ = 'Converts between several survey data files formats'
 
-__descriptionfull__ = '''A cross platform survey data files converter created
+__descriptionfull__ = '''A cross platform fsurvey data files converter created
 to help gathering survey data for Speleoclub Wrocław.'''
 
 __licensefull__ = '''

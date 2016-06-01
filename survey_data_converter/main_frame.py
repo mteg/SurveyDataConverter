@@ -3,9 +3,11 @@
 from __future__ import unicode_literals
 
 import sys
+
 import wx
 import wx.lib.agw.persist as PERSIST
 
+from survey_reader import *
 from .info import (
     __appname__
 )
@@ -15,6 +17,9 @@ class MainFrame(wx.Frame):
     SURVEY_LABEL_TEXT = "Survey File:"
     SURVEY_FILE_CTRL_MESSAGE = "Select Survey Data File"
     SOURCE_FILE_CTRL_WILDCARD = "Supported files (*.the;*.txt)|*.the;*.txt|Therion file (*.the)|*.the|Text file (*.txt)|*.txt|All files (*.*)|*.*"
+
+    ALERT_UNSUPPORTED_FILE_TYPE_CAPTION = "Unsupported file"
+    ALERT_UNSUPPORTED_FILE_TYPE_MESSAGE = "Can't recognize this file as a survey data, probably it's unsupported yet."
 
     def __init__(self, parent=None):
         wx.Frame.__init__(self, parent, wx.ID_ANY, __appname__,style=self.FRAME_STYLE, name="MainFrame")
@@ -37,6 +42,7 @@ class MainFrame(wx.Frame):
         self._register_and_restore()
 
         self.Bind(wx.EVT_CLOSE, self._on_exit)
+        self._source_file_ctrl.Bind(wx.EVT_FILEPICKER_CHANGED, self._on_file_selected)
 
     def _register_and_restore(self):
         mgr = PERSIST.PersistenceManager.Get()
@@ -45,6 +51,15 @@ class MainFrame(wx.Frame):
     def _on_exit(self, event):
         mgr = PERSIST.PersistenceManager.Get()
         mgr.SaveAndUnregister()
+        event.Skip()
+
+    def _on_file_selected(self, event):
+        survey_file_path = self._source_file_ctrl.GetPath()
+        self._file_reader = SurveyReader(survey_file_path)
+        export_possible = self._file_reader is not None
+        self._toggle_export_interface(export_possible)
+        if not export_possible:
+            self._alert_unsupported_survey_file()
         event.Skip()
 
     def _add_sizers(self):
@@ -65,3 +80,11 @@ class MainFrame(wx.Frame):
         main_sizer = wx.BoxSizer(wx.VERTICAL)
         main_sizer.Add(self._panel, 1, wx.EXPAND)
         self.SetSizer(main_sizer)
+
+    def _alert_unsupported_survey_file(self):
+        alert = wx.MessageDialog(self, self.ALERT_UNSUPPORTED_FILE_TYPE_MESSAGE, self.ALERT_UNSUPPORTED_FILE_TYPE_CAPTION, wx.OK | wx.ICON_ERROR)
+        alert.ShowModal()
+        alert.Destroy()
+
+    def _toggle_export_interface(self, active):
+        pass

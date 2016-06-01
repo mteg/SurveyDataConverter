@@ -18,6 +18,8 @@ from __future__ import unicode_literals
 
 import sys
 
+import gettext
+
 try:
     import wx
 except ImportError as error:
@@ -38,6 +40,7 @@ from .info import (
 )
 
 from .main_frame import MainFrame
+
 
 def main():
     """The real main. Creates and calls the main app windows. """
