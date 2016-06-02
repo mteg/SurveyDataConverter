@@ -19,10 +19,11 @@ class MainFrame(wx.Frame):
     SOURCE_FILE_CTRL_WILDCARD = "Supported files (*.the;*.txt)|*.the;*.txt|Therion file (*.the)|*.the|Text file (*.txt)|*.txt|All files (*.*)|*.*"
 
     ALERT_UNSUPPORTED_FILE_TYPE_CAPTION = "Unsupported file"
-    ALERT_UNSUPPORTED_FILE_TYPE_MESSAGE = "Can't recognize this file as a survey data, probably it's unsupported yet."
+    ALERT_UNSUPPORTED_FILE_TYPE_MESSAGE = "Can't recognize this file as a survey data, probably it isn't supported yet."
 
     def __init__(self, parent=None):
         wx.Frame.__init__(self, parent, wx.ID_ANY, __appname__,style=self.FRAME_STYLE, name="MainFrame")
+        self.__active = False
         self.SetMinClientSize(wx.Size(400,0))
 
         self._panel = wx.Panel(self)
@@ -87,4 +88,6 @@ class MainFrame(wx.Frame):
         alert.Destroy()
 
     def _toggle_export_interface(self, active):
+        if self.__active == active:
+            return
         pass
