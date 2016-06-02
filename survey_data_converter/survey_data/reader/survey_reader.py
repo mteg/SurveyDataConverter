@@ -3,6 +3,8 @@
 
 from abc import ABCMeta, abstractmethod
 
+from survey_data.data import *
+
 class SurveyReader(object):
   __metaclass__ = ABCMeta
 
@@ -14,6 +16,7 @@ class SurveyReader(object):
     return None
 
   def __init__(self, file_path):
+    super(SurveyData, self).__init__()
     self.date = None
     self.survey_comment = None
     self.declination = 0

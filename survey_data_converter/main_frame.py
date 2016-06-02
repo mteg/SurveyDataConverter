@@ -7,7 +7,7 @@ import sys
 import wx
 import wx.lib.agw.persist as PERSIST
 
-from survey_reader import *
+from survey_data import *
 from .info import (
     __appname__
 )
@@ -84,6 +84,7 @@ class MainFrame(wx.Frame):
 
     def _alert_unsupported_survey_file(self):
         alert = wx.MessageDialog(self, self.ALERT_UNSUPPORTED_FILE_TYPE_MESSAGE, self.ALERT_UNSUPPORTED_FILE_TYPE_CAPTION, wx.OK | wx.ICON_ERROR)
+        alert.Center()
         alert.ShowModal()
         alert.Destroy()
 
