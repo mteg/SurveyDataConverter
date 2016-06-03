@@ -14,11 +14,11 @@ import sys
 if not __package__ and not hasattr(sys, "frozen"):
     # direct call of __main__.py
     import os.path
+
     PATH = os.path.realpath(os.path.abspath(__file__))
     sys.path.append(os.path.dirname(os.path.dirname(PATH)))
 
 import survey_data_converter
-
 
 if __name__ == '__main__':
     survey_data_converter.main()

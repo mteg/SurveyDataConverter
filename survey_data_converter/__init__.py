@@ -21,7 +21,7 @@ import sys
 try:
     import wx
 except ImportError as error:
-    print error
+    print(error)
     sys.exit(1)
 
 # For package use
@@ -39,9 +39,11 @@ from .info import (
 
 from .main_frame import MainFrame
 
+
 def main():
     """The real main. Creates and calls the main app windows. """
-    app = wx.App(False)  # Create a new app, don't redirect stdout/stderr to a window.
-    frame = MainFrame() # A Frame is a top-level window.
-    frame.Show(True)     # Show the frame.
+    app = wx.App(
+        False)  # Create a new app, don't redirect stdout/stderr to a window.
+    frame = MainFrame()  # A Frame is a top-level window.
+    frame.Show(True)  # Show the frame.
     app.MainLoop()
