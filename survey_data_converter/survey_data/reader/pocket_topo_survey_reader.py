@@ -2,15 +2,19 @@
 # -*- coding: utf-8 -*-
 
 # czaf   (m, 360)
+# or (still first line)
+# (m, 360)
 #
 # [1]: 2015/01/04     0.00  "Arek distox\rMarta dog\rIda plan"
+# [2]: 2015/01/04     5.00
 #
 #
-#     1.0                   0.000    0.00    0.00
-#     1.0        1.2        2.193  181.76    1.93  [1]  ; comment
-#     1.0                   2.183  177.04   32.84  ; comment
+#     1.0                   0.000    0.00    0.00 "comment"
+#     1.0        1.2        2.193  181.76    1.93  [1] "comment"
 #     1.0                   2.022  179.02   57.35  
 #     1.0                   2.154  160.44  -17.33  [1]
+#     1.0                   2.154  160.44  -17.33  [1] "comment"
+#     1.0        1.2        2.154  160.44  -17.33  [1]
 
 import datetime
 import shlex
@@ -30,17 +34,24 @@ class PocketTopoSurveyReader(SurveyReader):
         first_line = f.readline()
         f.close()
         first_line = first_line.strip()
-        index = first_line.rfind(cls.TYPICAL_STRING)
-        if index == -1:
-            return False
-        if index + len(cls.TYPICAL_STRING) == len(first_line):
+        if first_line.endswith(cls.TYPICAL_STRING):
             return True
-        return False
+        else:
+            return False
+
+    @classmethod
+    def file_type(cls):
+        return "txt"
+
+    @classmethod
+    def file_extension(cls):
+        return "PocketTopo txt"
 
     def _read_data(self, file_path):
         state = 0
         with open(file_path, 'rb') as f:
             for line in f.readlines():
+                line = line.strip()
                 data = shlex.split(line)
                 if len(data) == 0:
                     continue

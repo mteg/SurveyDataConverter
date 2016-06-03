@@ -25,6 +25,22 @@ class SurveyReader(object):
     def can_read_file(cls, file_path):
         raise NotImplementedError
 
+    @classmethod
+    def supported_files(cls):
+        supported_files = []
+        for reader_class in reader_classes:
+            supported_files.append(
+                    [reader_class.file_type(), reader_class.file_extension()])
+        return supported_files
+
+    @classmethod
+    def file_type(cls):
+        raise NotImplementedError
+
+    @classmethod
+    def file_extension(cls):
+        raise NotImplemented
+
     def _read_data(self, file_path):
         raise NotImplementedError
 
