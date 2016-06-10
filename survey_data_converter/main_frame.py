@@ -14,6 +14,7 @@ from .info import (
 
 from survey_data import SurveyReader, SurveyWriter
 
+
 class MainFrame(wx.Frame):
     FRAME_STYLE = wx.DEFAULT_FRAME_STYLE ^ (wx.RESIZE_BORDER | wx.MAXIMIZE_BOX)
     SURVEY_LABEL_TEXT = "Survey File:"
@@ -48,7 +49,7 @@ class MainFrame(wx.Frame):
             writer_types.append(writer.file_type())
 
         self._writers_panel = wx.RadioBox(self._panel, label="Convert to:",
-                                          majorDimension = 1,
+                                          majorDimension=1,
                                           choices=writer_types,
                                           style=wx.RA_SPECIFY_ROWS)
 
@@ -86,9 +87,14 @@ class MainFrame(wx.Frame):
         survey_file_path = self._source_file_ctrl.GetPath()
         save_file_name = os.path.basename(survey_file_path)
         save_file_name = os.path.splitext(save_file_name)[0]
-        save_file_dialog = wx.FileDialog(self, message="Save As", wildcard = wildcard, defaultFile = save_file_name, style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
+        save_file_dialog = wx.FileDialog(self, message="Save As",
+                                         wildcard=wildcard,
+                                         defaultFile=save_file_name,
+                                         style=wx.FD_SAVE |
+                                               wx.FD_OVERWRITE_PROMPT)
         if save_file_dialog.ShowModal() == wx.ID_OK:
             writer(self._file_reader.survey, save_file_dialog.GetPath())
+        save_file_dialog.Destroy()
         event.Skip()
 
     def _on_file_selected(self, event):
@@ -115,11 +121,11 @@ class MainFrame(wx.Frame):
         vertical_sizer.Add(wx.StaticLine(self._panel), 0,
                            wx.TOP | wx.BOTTOM | wx.EXPAND, 10)
 
-
-        vertical_sizer.Add(self._writers_panel, 0, wx.TOP | wx.BOTTOM | wx.EXPAND,
+        vertical_sizer.Add(self._writers_panel, 0,
+                           wx.TOP | wx.BOTTOM | wx.EXPAND,
                            0)
         vertical_sizer.AddSpacer(5)
-        vertical_sizer.Add(self._save_button, 0, wx.ALIGN_RIGHT ,
+        vertical_sizer.Add(self._save_button, 0, wx.ALIGN_RIGHT,
                            0)
 
         horizontal_sizer.Add(vertical_sizer, 1, wx.EXPAND | wx.ALL, 10)
