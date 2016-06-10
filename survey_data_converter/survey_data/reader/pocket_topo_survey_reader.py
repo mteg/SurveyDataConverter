@@ -41,11 +41,11 @@ class PocketTopoSurveyReader(SurveyReader):
 
     @classmethod
     def file_type(cls):
-        return "txt"
+        return "PocketTopo txt"
 
     @classmethod
     def file_extension(cls):
-        return "PocketTopo txt"
+        return "txt"
 
     def _read_data(self, file_path):
         state = 0
@@ -96,14 +96,14 @@ class PocketTopoSurveyReader(SurveyReader):
                                 data_line.comment = data[4]
                                 non_data_idx = min(non_data_idx, 4)
                     non_data_idx = min(non_data_idx, len(data))
-                    if (non_data_idx == 5):
+                    if non_data_idx == 5:
                         data_line.toSt = data[1]
                     data_line.fromSt = data[0]
                     data_line.tape = float(data[non_data_idx - 3])
                     data_line.compass = float(data[non_data_idx - 2])
                     data_line.clino = float(data[non_data_idx - 1])
 
-                    is_splay = not data_line.toSt;
+                    is_splay = not data_line.toSt
 
                     if data_line.tape == 0 and is_splay:
                         continue

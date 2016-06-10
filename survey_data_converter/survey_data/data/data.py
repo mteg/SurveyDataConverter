@@ -15,7 +15,8 @@ class DataLine(object):
     def __eq__(self, other):
         if type(self) != type(other):
             return False
-        return  self.fromSt == other.fromSt && self.toSt == other.toSt
+        return self.fromSt == other.fromSt and self.toSt == other.toSt
+
 
 class Trip(object):
     def __init__(self):

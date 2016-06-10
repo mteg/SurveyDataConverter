@@ -5,6 +5,7 @@ from abc import ABCMeta
 
 from ..data import *
 
+
 class SurveyReader(object):
     __metaclass__ = ABCMeta
 
@@ -27,6 +28,7 @@ class SurveyReader(object):
 
     @classmethod
     def supported_files(cls):
+        reader_classes = cls.__subclasses__()
         supported_files = []
         for reader_class in reader_classes:
             supported_files.append(
@@ -39,7 +41,7 @@ class SurveyReader(object):
 
     @classmethod
     def file_extension(cls):
-        raise NotImplemented
+        raise NotImplementedError
 
     def _read_data(self, file_path):
         raise NotImplementedError
