@@ -7,6 +7,7 @@ from survey_writer import *
 class WallsSurveyWriter(SurveyWriter):
     def __init__(self, survey, file_path):
         super(WallsSurveyWriter, self).__init__(survey, file_path)
+        print "HI"
 
     @classmethod
     def file_type(cls):
@@ -17,6 +18,6 @@ class WallsSurveyWriter(SurveyWriter):
         return "srv"
 
     def _write_data(self, file_path):
-        f = open('file_path', 'w')
+        f = open(file_path, 'w')
 
         f.close()

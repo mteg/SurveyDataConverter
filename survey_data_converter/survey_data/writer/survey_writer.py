@@ -14,8 +14,6 @@ class SurveyWriter(object):
         self.survey = survey
         self._write_data(file_path)
 
-        raise NotImplementedError
-
     @classmethod
     def supported_files(cls):
         writer_classes = cls.__subclasses__()

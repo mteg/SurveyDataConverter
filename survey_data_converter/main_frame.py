@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 import sys
+import os
 
 import wx
 import wx.lib.agw.persist as PERSIST
@@ -11,7 +12,7 @@ from .info import (
     __appname__
 )
 
-from survey_data import SurveyReader
+from survey_data import SurveyReader, SurveyWriter
 
 class MainFrame(wx.Frame):
     FRAME_STYLE = wx.DEFAULT_FRAME_STYLE ^ (wx.RESIZE_BORDER | wx.MAXIMIZE_BOX)
@@ -41,12 +42,25 @@ class MainFrame(wx.Frame):
                                                    message=self.SURVEY_FILE_CTRL_MESSAGE,
                                                    wildcard=self.SOURCE_FILE_CTRL_WILDCARD)
 
+        self._writers = SurveyWriter.__subclasses__()
+        writer_types = []
+        for writer in self._writers:
+            writer_types.append(writer.file_type())
+
+        self._writers_panel = wx.RadioBox(self._panel, label="Convert to:",
+                                          majorDimension = 1,
+                                          choices=writer_types,
+                                          style=wx.RA_SPECIFY_ROWS)
+
+        self._save_button = wx.Button(self._panel, label="Save")
+        self._save_button.Bind(wx.EVT_BUTTON, self._on_save)
+
         if sys.platform == "win32":
             self._source_file_ctrl.GetPickerCtrl().SetLabel("Browse...")
 
         self._add_sizers()
 
-        self.Fit()
+        self._toggle_export_interface(False)
         self.Center()
 
         self._register_and_restore()
@@ -58,10 +72,23 @@ class MainFrame(wx.Frame):
     def _register_and_restore(self):
         mgr = PERSIST.PersistenceManager.Get()
         mgr.RegisterAndRestore(self)
+        self.Fit()
 
     def _on_exit(self, event):
         mgr = PERSIST.PersistenceManager.Get()
         mgr.SaveAndUnregister()
+        event.Skip()
+
+    def _on_save(self, event):
+        idx = self._writers_panel.GetSelection()
+        writer = self._writers[idx]
+        wildcard = writer.file_type() + " | *." + writer.file_extension()
+        survey_file_path = self._source_file_ctrl.GetPath()
+        save_file_name = os.path.basename(survey_file_path)
+        save_file_name = os.path.splitext(save_file_name)[0]
+        save_file_dialog = wx.FileDialog(self, message="Save As", wildcard = wildcard, defaultFile = save_file_name, style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
+        if save_file_dialog.ShowModal() == wx.ID_OK:
+            writer(self._file_reader.survey, save_file_dialog.GetPath())
         event.Skip()
 
     def _on_file_selected(self, event):
@@ -86,7 +113,14 @@ class MainFrame(wx.Frame):
         vertical_sizer.Add(source_file_sizer, 0, wx.TOP | wx.BOTTOM | wx.EXPAND,
                            0)
         vertical_sizer.Add(wx.StaticLine(self._panel), 0,
-                           wx.TOP | wx.BOTTOM | wx.EXPAND, 5)
+                           wx.TOP | wx.BOTTOM | wx.EXPAND, 10)
+
+
+        vertical_sizer.Add(self._writers_panel, 0, wx.TOP | wx.BOTTOM | wx.EXPAND,
+                           0)
+        vertical_sizer.AddSpacer(5)
+        vertical_sizer.Add(self._save_button, 0, wx.ALIGN_RIGHT ,
+                           0)
 
         horizontal_sizer.Add(vertical_sizer, 1, wx.EXPAND | wx.ALL, 10)
         self._panel.SetSizer(horizontal_sizer)
@@ -104,6 +138,5 @@ class MainFrame(wx.Frame):
         alert.Destroy()
 
     def _toggle_export_interface(self, active):
-        if self.__active == active:
-            return
-        pass
+        self._writers_panel.Enable(active)
+        self._save_button.Enable(active)
