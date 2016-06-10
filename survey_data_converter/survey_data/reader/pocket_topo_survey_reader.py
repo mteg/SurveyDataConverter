@@ -102,9 +102,19 @@ class PocketTopoSurveyReader(SurveyReader):
                     data_line.tape = float(data[non_data_idx - 3])
                     data_line.compass = float(data[non_data_idx - 2])
                     data_line.clino = float(data[non_data_idx - 1])
+
+                    is_splay = not data_line.toSt;
+
+                    if data_line.tape == 0 and is_splay:
+                        continue
+
                     trip = self._trip_with_name(trip_name)
                     if trip is not None:
                         trip.data.append(data_line)
+                        if is_splay:
+                            trip.splays_count += 1
+                        elif data_line != trip.last_dataline:
+                            trip.shots_count += 1
                     continue
         return self.survey
 
