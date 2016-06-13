@@ -9,9 +9,10 @@ from ..data import *
 class SurveyWriter(object):
     __metaclass__ = ABCMeta
 
-    def __init__(self, survey, file_path):
+    def __init__(self, survey, file_path, source_file_name):
         super(SurveyWriter, self).__init__()
         self.survey = survey
+        self._source_file_name = source_file_name
         self._write_data(file_path)
 
     @classmethod
@@ -20,7 +21,7 @@ class SurveyWriter(object):
         supported_files = []
         for writer_class in writer_classes:
             supported_files.append(
-                    [writer_class.file_type(), writer_class.file_extension()])
+                [writer_class.file_type(), writer_class.file_extension()])
         return supported_files
 
     @classmethod

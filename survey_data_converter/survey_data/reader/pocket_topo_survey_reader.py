@@ -61,7 +61,7 @@ class PocketTopoSurveyReader(SurveyReader):
                     state = 1
                     continue
                 if state == 1:
-                    # This is a data line, we will skip parsin
+                    # This is a data line, we will skip parsing
                     if not data[0].startswith("["):
                         state = 2
                     else:
@@ -75,6 +75,7 @@ class PocketTopoSurveyReader(SurveyReader):
                         self.survey.trips.append(trip)
                         continue
                 if state == 2:
+                    state = 1
                     data_line = DataLine()
                     trip_name = ""
                     non_data_idx = 6
@@ -99,27 +100,26 @@ class PocketTopoSurveyReader(SurveyReader):
                     if non_data_idx == 5:
                         data_line.toSt = data[1]
                     data_line.fromSt = data[0]
-                    data_line.tape = float(data[non_data_idx - 3])
-                    data_line.compass = float(data[non_data_idx - 2])
-                    data_line.clino = float(data[non_data_idx - 1])
+                    data_line.tape = float(data[non_data_idx - 3].replace(",","."))
+                    data_line.compass = float(data[non_data_idx - 2].replace(",","."))
+                    data_line.clino = float(data[non_data_idx - 1].replace(",","."))
 
                     is_splay = not data_line.toSt
 
                     if data_line.tape == 0 and is_splay:
                         continue
-
                     trip = self._trip_with_name(trip_name)
                     if trip is not None:
-                        trip.data.append(data_line)
                         if is_splay:
                             trip.splays_count += 1
                         elif data_line != trip.last_dataline:
                             trip.shots_count += 1
+                        trip.data.append(data_line)
                     continue
         return self.survey
 
     def __trip_name_from_string(self, trip_string):
-        return trip_string.strip('[]')
+        return trip_string.strip('[]:')
 
     def _read_data_line(self, line):
         return None

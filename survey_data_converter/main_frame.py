@@ -28,6 +28,8 @@ class MainFrame(wx.Frame):
     ALERT_UNSUPPORTED_FILE_TYPE_MESSAGE = "Can't recognize this file as a " \
                                           "survey data, probably it isn't " \
                                           "supported yet."
+    ALERT_FINISHED_CAPTION = "File saved"
+    ALERT_FINISHED_MESSAGE = "All data have been exported to the file you selected."
 
     def __init__(self, parent=None):
         wx.Frame.__init__(self, parent, wx.ID_ANY, __appname__,
@@ -83,17 +85,23 @@ class MainFrame(wx.Frame):
     def _on_save(self, event):
         idx = self._writers_panel.GetSelection()
         writer = self._writers[idx]
-        wildcard = writer.file_type() + " | *." + writer.file_extension()
         survey_file_path = self._source_file_ctrl.GetPath()
         save_file_name = os.path.basename(survey_file_path)
         save_file_name = os.path.splitext(save_file_name)[0]
+        save_file_name += "." + writer.file_extension()
         save_file_dialog = wx.FileDialog(self, message="Save As",
-                                         wildcard=wildcard,
                                          defaultFile=save_file_name,
                                          style=wx.FD_SAVE |
                                                wx.FD_OVERWRITE_PROMPT)
         if save_file_dialog.ShowModal() == wx.ID_OK:
-            writer(self._file_reader.survey, save_file_dialog.GetPath())
+            writer(self._file_reader.survey, save_file_dialog.GetPath(), os.path.basename(survey_file_path))
+            alert = wx.MessageDialog(self, self.ALERT_FINISHED_MESSAGE,
+                                     self.ALERT_FINISHED_CAPTION,
+                                     wx.OK | wx.ICON_INFORMATION)
+            alert.Center()
+            alert.ShowModal()
+            alert.Destroy()
+
         save_file_dialog.Destroy()
         event.Skip()
 
