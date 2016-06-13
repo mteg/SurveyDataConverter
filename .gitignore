@@ -186,3 +186,6 @@ fabric.properties
 
 /build/
 /dist/
+/setup_script.iss
+/Output/
+
