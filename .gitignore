@@ -182,3 +182,7 @@ crashlytics-build.properties
 fabric.properties
 
 .idea/**
+
+
+/build/
+/dist/
