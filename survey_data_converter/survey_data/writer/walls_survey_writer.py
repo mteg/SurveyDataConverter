@@ -3,6 +3,7 @@
 
 from survey_writer import *
 import StringIO
+import math
 
 
 class WallsSurveyWriter(SurveyWriter):
@@ -27,8 +28,17 @@ class WallsSurveyWriter(SurveyWriter):
             f.write(";#PREFIX %s\n" % self.survey.name)
         f.write("#UNITS D=M A=G V=G Order=DAV\n\n")
         for trip in self.survey.trips:
+
             if trip.shots_count == 0:
                 continue
+
+            have_duplicates = False
+            p = DataLine()
+            for data in trip.data:
+                if p.toSt and data.toSt and p.toSt == data.toSt:
+                    have_duplicates = True
+                    break
+                p = data
 
             if trip.date:
                 date_string = trip.date.strftime("%Y-%m-%d")
@@ -43,13 +53,55 @@ class WallsSurveyWriter(SurveyWriter):
                     f.write(";%s\n" % comment_line)
                 f.write("\n")
 
+            if have_duplicates:
+                self.__previous_data = DataLine()
+                self.__tape = []
+                self.__compass = []
+                self.__clino = []
+
             for data in trip.data:
-                toSt  = data.toSt
-                if not toSt:
-                    toSt = "-"
-                f.write("%s\t%s\t%0.3f\t%0.2f\t%0.2f" % (data.fromSt, toSt, data.tape, data.compass, data.clino))
+                prefix = ""
+                if have_duplicates:
+                    if not data.toSt or (
+                            data.fromSt != self.__previous_data.fromSt and data.toSt != self.__previous_data.toSt):
+                        self.__write_calculated_shot(f)
+                    self.__previous_data = data
+
+                    if data.toSt:
+                        self.__tape.append(data.tape)
+                        self.__compass.append(data.compass)
+                        self.__clino.append(data.clino)
+                        prefix = ";"
+
+                toSt = data.toSt
+                if not toSt: toSt = "-"
+
+                f.write(
+                    "%s%s\t%s\t%0.3f\t%0.2f\t%0.2f" % (prefix, data.fromSt, toSt, data.tape, data.compass, data.clino))
                 if data.comment:
                     f.write("\t;%s\n" % data.comment)
                 else:
                     f.write("\n")
+            if have_duplicates: self.__write_calculated_shot(f)
+
         f.close()
+
+    def __write_calculated_shot(self, f):
+        if len(self.__tape) == 0:
+            return
+        calculated_tape = sum(self.__tape) / len(self.__tape)
+        calculated_clino = sum(self.__clino) / len(self.__clino)
+        x = 0
+        y = 0
+        for angle in self.__compass:
+            x += math.cos(math.radians(angle))
+            y += math.sin(math.radians(angle))
+        calculated_compass = math.degrees(math.atan2(y, x)) % 360
+        if calculated_compass == 360: calculated_compass = 0
+
+        f.write("%s\t%s\t%0.3f\t%0.2f\t%0.2f\t;Calculated from shots above\n" % (
+            self.__previous_data.fromSt, self.__previous_data.toSt, calculated_tape, calculated_compass,
+            calculated_clino))
+        self.__tape = []
+        self.__compass = []
+        self.__clino = []
