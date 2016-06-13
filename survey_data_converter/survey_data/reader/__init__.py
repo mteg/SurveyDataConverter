@@ -3,3 +3,4 @@
 
 from survey_reader import *
 import pocket_topo_survey_reader
+import cave_explorer_survey_reader

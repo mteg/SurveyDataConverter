@@ -16,8 +16,8 @@
 #     1.0                   2.154  160.44  -17.33  [1] "comment"
 #     1.0        1.2        2.154  160.44  -17.33  [1]
 
-import datetime
 import shlex
+import datetime
 
 from survey_reader import *
 
@@ -120,6 +120,3 @@ class PocketTopoSurveyReader(SurveyReader):
 
     def __trip_name_from_string(self, trip_string):
         return trip_string.strip('[]:')
-
-    def _read_data_line(self, line):
-        return None
