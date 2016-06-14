@@ -8,7 +8,8 @@ import math
 
 class WallsSurveyWriter(SurveyWriter):
     def __init__(self, survey, file_path, source_file_name):
-        super(WallsSurveyWriter, self).__init__(survey, file_path, source_file_name)
+        super(WallsSurveyWriter, self).__init__(survey, file_path,
+                                                source_file_name)
 
     @classmethod
     def file_type(cls):
@@ -50,7 +51,7 @@ class WallsSurveyWriter(SurveyWriter):
                 f.write(";Comment from file:\n")
                 comment = StringIO.StringIO(trip.comment)
                 for comment_line in comment:
-                    f.write(";%s\n" % comment_line)
+                    f.write(";%s\n" % comment_line.strip())
                 f.write("\n")
 
             if have_duplicates:
@@ -63,7 +64,9 @@ class WallsSurveyWriter(SurveyWriter):
                 prefix = ""
                 if have_duplicates:
                     if not data.toSt or (
-                            data.fromSt != self.__previous_data.fromSt and data.toSt != self.__previous_data.toSt):
+                                    data.fromSt !=
+                                    self.__previous_data.fromSt or data.toSt
+                                != self.__previous_data.toSt):
                         self.__write_calculated_shot(f)
                     self.__previous_data = data
 
@@ -77,11 +80,17 @@ class WallsSurveyWriter(SurveyWriter):
                 if not toSt: toSt = "-"
 
                 f.write(
-                    "%s%s\t%s\t%0.3f\t%0.2f\t%0.2f" % (prefix, data.fromSt, toSt, data.tape, data.compass, data.clino))
-                if data.comment:
-                    f.write("\t;%s\n" % data.comment)
-                else:
-                    f.write("\n")
+                        "%s%s\t%s\t%0.3f\t%0.2f\t%0.2f" % (
+                            prefix, data.fromSt, toSt, data.tape, data.compass,
+                            data.clino))
+
+                comment = data.comment
+                if data.tape == 0: comment = "Connecting shot, treating as " \
+                                             "comment; " + comment
+                comment = comment.strip(' ;').strip()
+                if comment:
+                    f.write("\t;%s" % comment)
+                f.write("\n")
             if have_duplicates: self.__write_calculated_shot(f)
 
         f.close()
@@ -90,6 +99,7 @@ class WallsSurveyWriter(SurveyWriter):
         if len(self.__tape) == 0:
             return
         calculated_tape = sum(self.__tape) / len(self.__tape)
+        if calculated_tape == 0: return
         calculated_clino = sum(self.__clino) / len(self.__clino)
         x = 0
         y = 0
@@ -98,10 +108,11 @@ class WallsSurveyWriter(SurveyWriter):
             y += math.sin(math.radians(angle))
         calculated_compass = math.degrees(math.atan2(y, x)) % 360
         if calculated_compass == 360: calculated_compass = 0
-
-        f.write("%s\t%s\t%0.3f\t%0.2f\t%0.2f\t;Calculated from shots above\n" % (
-            self.__previous_data.fromSt, self.__previous_data.toSt, calculated_tape, calculated_compass,
-            calculated_clino))
+        f.write(
+            "%s\t%s\t%0.3f\t%0.2f\t%0.2f\t;Calculated from shots above\n" % (
+                self.__previous_data.fromSt, self.__previous_data.toSt,
+                calculated_tape, calculated_compass,
+                calculated_clino))
         self.__tape = []
         self.__compass = []
         self.__clino = []
