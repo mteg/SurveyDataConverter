@@ -20,6 +20,10 @@ class MainFrame(wx.Frame):
     SURVEY_LABEL_TEXT = "Survey File:"
     SURVEY_FILE_CTRL_MESSAGE = "Select Survey Data File"
 
+    LICENSE_LABEL_TEXT = "Add standard header in exported file"
+    LICENSE_TEXT = """This survey data is made available under the Open Data Commons Attribution License:
+http://opendatacommons.org/licenses/by/1.0/"""
+
     ALERT_UNSUPPORTED_FILE_TYPE_CAPTION = "Unsupported file"
     ALERT_UNSUPPORTED_FILE_TYPE_MESSAGE = "Can't recognize this file as a " \
                                           "survey data, probably it isn't " \
@@ -43,9 +47,10 @@ class MainFrame(wx.Frame):
             file_types_string += "*.%s;" % extension
         file_types_string = file_types_string.strip(';')
 
-        wildcard = "Supported files (%s)|%s" % (file_types_string, file_types_string)
+        wildcard = "Supported files (%s)|%s" % (
+        file_types_string, file_types_string)
 
-        self.SetMinClientSize(wx.Size(400, 0))
+        self.SetMinClientSize(wx.Size(400, -1))
 
         self._panel = wx.Panel(self)
 
@@ -65,6 +70,16 @@ class MainFrame(wx.Frame):
                                           choices=writer_types,
                                           style=wx.RA_SPECIFY_ROWS)
 
+        self._license_checkbox = wx.CheckBox(self._panel, style=wx.CHK_2STATE,
+                                             label=self.LICENSE_LABEL_TEXT,
+                                             name="AddLicense")
+        self._license_checkbox.SetValue(True)
+        self._license_textfield = wx.TextCtrl(self._panel,
+                                              style=wx.TE_MULTILINE | wx.TE_DONTWRAP | wx.HSCROLL,
+                                              size=(-1, 60),
+                                              name="LicenseText")
+        self._license_textfield.SetValue(self.LICENSE_TEXT)
+
         self._save_button = wx.Button(self._panel, label="Save")
         self._save_button.Bind(wx.EVT_BUTTON, self._on_save)
 
@@ -74,6 +89,7 @@ class MainFrame(wx.Frame):
         self._add_sizers()
 
         self._toggle_export_interface(False)
+
         self.Center()
 
         self._register_and_restore()
@@ -85,6 +101,8 @@ class MainFrame(wx.Frame):
     def _register_and_restore(self):
         mgr = PERSIST.PersistenceManager.Get()
         mgr.RegisterAndRestore(self)
+        mgr.RegisterAndRestore(self._license_checkbox)
+        mgr.RegisterAndRestore(self._license_textfield)
         self.Fit()
 
     def _on_exit(self, event):
@@ -93,6 +111,10 @@ class MainFrame(wx.Frame):
         event.Skip()
 
     def _on_save(self, event):
+        header = ""
+        if self._license_checkbox.GetValue():
+            header = self._license_textfield.GetValue()
+
         idx = self._writers_panel.GetSelection()
         writer = self._writers[idx]
         survey_file_path = self._source_file_ctrl.GetPath()
@@ -104,7 +126,7 @@ class MainFrame(wx.Frame):
                                          style=wx.FD_SAVE |
                                                wx.FD_OVERWRITE_PROMPT)
         if save_file_dialog.ShowModal() == wx.ID_OK:
-            writer(self._file_reader, save_file_dialog.GetPath())
+            writer(self._file_reader, save_file_dialog.GetPath(), header)
             alert = wx.MessageDialog(self, self.ALERT_FINISHED_MESSAGE,
                                      self.ALERT_FINISHED_CAPTION,
                                      wx.OK | wx.ICON_INFORMATION)
@@ -142,7 +164,17 @@ class MainFrame(wx.Frame):
         vertical_sizer.Add(self._writers_panel, 0,
                            wx.TOP | wx.BOTTOM | wx.EXPAND,
                            0)
+
+        vertical_sizer.Add(wx.StaticLine(self._panel), 0,
+                           wx.TOP | wx.BOTTOM | wx.EXPAND, 10)
+        vertical_sizer.Add(self._license_checkbox, 0,
+                           wx.ALIGN_CENTER_HORIZONTAL, 0)
         vertical_sizer.AddSpacer(5)
+        vertical_sizer.Add(self._license_textfield, 0,
+                           wx.TOP | wx.BOTTOM | wx.EXPAND, 0)
+        vertical_sizer.AddSpacer(5)
+        vertical_sizer.Add(wx.StaticLine(self._panel), 0,
+                           wx.TOP | wx.BOTTOM | wx.EXPAND, 10)
         vertical_sizer.Add(self._save_button, 0, wx.ALIGN_RIGHT,
                            0)
 

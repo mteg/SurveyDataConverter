@@ -8,8 +8,9 @@ import os
 
 
 class WallsSurveyWriter(SurveyWriter):
-    def __init__(self, survey_reader, file_path):
-        super(WallsSurveyWriter, self).__init__(survey_reader, file_path)
+    def __init__(self, survey_reader, file_path, header):
+        super(WallsSurveyWriter, self).__init__(survey_reader, file_path,
+                                                header)
 
     @classmethod
     def file_type(cls):
@@ -26,6 +27,12 @@ class WallsSurveyWriter(SurveyWriter):
             first_line = self._survey_reader.survey.name
         f.write(";%s\n" % first_line)
         f.write(";%s (%s)\n\n" % (os.path.basename(self._survey_reader.file_path), self._survey_reader.file_type()))
+
+        if self._header:
+            header_lines = self._header.splitlines()
+            for header_line in header_lines:
+                f.write(";%s\n" % header_line.strip())
+            f.write("\n")
 
         f.write(";#PREFIX %s\n" % first_line)
         f.write("#UNITS D=M A=G V=G Order=DAV\n\n")
