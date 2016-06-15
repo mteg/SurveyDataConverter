@@ -70,7 +70,7 @@ class WallsSurveyWriter(SurveyWriter):
                         self.__write_calculated_shot(f)
                     self.__previous_data = data
 
-                    if data.toSt:
+                    if data.toSt and data.tape != 0:
                         self.__tape.append(data.tape)
                         self.__compass.append(data.compass)
                         self.__clino.append(data.clino)

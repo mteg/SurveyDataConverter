@@ -19,10 +19,6 @@ class MainFrame(wx.Frame):
     FRAME_STYLE = wx.DEFAULT_FRAME_STYLE ^ (wx.RESIZE_BORDER | wx.MAXIMIZE_BOX)
     SURVEY_LABEL_TEXT = "Survey File:"
     SURVEY_FILE_CTRL_MESSAGE = "Select Survey Data File"
-    SOURCE_FILE_CTRL_WILDCARD = "Supported files (" \
-                                "*.the;*.txt)|*.the;*.txt|Therion file (" \
-                                "*.the)|*.the|Text file (*.txt)|*.txt|All " \
-                                "files (*.*)|*.*"
 
     ALERT_UNSUPPORTED_FILE_TYPE_CAPTION = "Unsupported file"
     ALERT_UNSUPPORTED_FILE_TYPE_MESSAGE = "Can't recognize this file as a " \
@@ -35,6 +31,20 @@ class MainFrame(wx.Frame):
         wx.Frame.__init__(self, parent, wx.ID_ANY, __appname__,
                           style=self.FRAME_STYLE, name="MainFrame")
         self.__active = False
+
+        supported_files = SurveyReader.supported_files()
+        supported_extensions = []
+        for supported_file in supported_files:
+            supported_extensions.append(supported_file[-1])
+        supported_extensions = list(set(supported_extensions))
+
+        file_types_string = ""
+        for extension in supported_extensions:
+            file_types_string += "*.%s;" % extension
+        file_types_string = file_types_string.strip(';')
+
+        wildcard = "Supported files (%s)|%s" % (file_types_string, file_types_string)
+
         self.SetMinClientSize(wx.Size(400, 0))
 
         self._panel = wx.Panel(self)
@@ -43,7 +53,7 @@ class MainFrame(wx.Frame):
                                                 label=self.SURVEY_LABEL_TEXT)
         self._source_file_ctrl = wx.FilePickerCtrl(self._panel,
                                                    message=self.SURVEY_FILE_CTRL_MESSAGE,
-                                                   wildcard=self.SOURCE_FILE_CTRL_WILDCARD)
+                                                   wildcard=wildcard)
 
         self._writers = SurveyWriter.__subclasses__()
         writer_types = []
