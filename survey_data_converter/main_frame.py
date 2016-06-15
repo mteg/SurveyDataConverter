@@ -104,7 +104,7 @@ class MainFrame(wx.Frame):
                                          style=wx.FD_SAVE |
                                                wx.FD_OVERWRITE_PROMPT)
         if save_file_dialog.ShowModal() == wx.ID_OK:
-            writer(self._file_reader.survey, save_file_dialog.GetPath(), os.path.basename(survey_file_path))
+            writer(self._file_reader, save_file_dialog.GetPath())
             alert = wx.MessageDialog(self, self.ALERT_FINISHED_MESSAGE,
                                      self.ALERT_FINISHED_CAPTION,
                                      wx.OK | wx.ICON_INFORMATION)

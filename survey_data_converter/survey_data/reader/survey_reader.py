@@ -18,6 +18,7 @@ class SurveyReader(object):
 
     def __init__(self, file_path):
         super(SurveyReader, self).__init__()
+        self.file_path = file_path
         self.survey = Survey()
         self.survey.trips.append(Trip())
         self._read_data(file_path)

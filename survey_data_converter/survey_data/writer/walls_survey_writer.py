@@ -4,12 +4,12 @@
 from survey_writer import *
 import StringIO
 import math
+import os
 
 
 class WallsSurveyWriter(SurveyWriter):
-    def __init__(self, survey, file_path, source_file_name):
-        super(WallsSurveyWriter, self).__init__(survey, file_path,
-                                                source_file_name)
+    def __init__(self, survey_reader, file_path):
+        super(WallsSurveyWriter, self).__init__(survey_reader, file_path)
 
     @classmethod
     def file_type(cls):
@@ -21,14 +21,15 @@ class WallsSurveyWriter(SurveyWriter):
 
     def _write_data(self, file_path):
         f = open(file_path, 'w')
-        if self.survey.name:
-            f.write(";%s\n" % self.survey.name)
-        f.write(";%s\n\n" % self._source_file_name)
+        first_line = os.path.splitext(os.path.basename(self._survey_reader.file_path))[0]
+        if self._survey_reader.survey.name:
+            first_line = self._survey_reader.survey.name
+        f.write(";%s\n" % first_line)
+        f.write(";%s (%s)\n\n" % (os.path.basename(self._survey_reader.file_path), self._survey_reader.file_type()))
 
-        if self.survey.name:
-            f.write(";#PREFIX %s\n" % self.survey.name)
+        f.write(";#PREFIX %s\n" % first_line)
         f.write("#UNITS D=M A=G V=G Order=DAV\n\n")
-        for trip in self.survey.trips:
+        for trip in self._survey_reader.survey.trips:
 
             if trip.shots_count == 0:
                 continue
@@ -85,8 +86,8 @@ class WallsSurveyWriter(SurveyWriter):
                             data.clino))
 
                 comment = data.comment
-                if data.tape == 0: comment = "Connecting shot, treating as " \
-                                             "comment; " + comment
+                comment = (" ".join(comment.splitlines())).strip()
+                if data.tape == 0: comment = "Connecting shot; " + comment
                 comment = comment.strip(' ;').strip()
                 if comment:
                     f.write("\t;%s" % comment)
