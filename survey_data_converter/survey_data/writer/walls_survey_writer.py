@@ -8,9 +8,9 @@ import os
 
 
 class WallsSurveyWriter(SurveyWriter):
-    def __init__(self, survey_reader, file_path, header):
+    def __init__(self, survey_reader, file_path, header, footer = ""):
         super(WallsSurveyWriter, self).__init__(survey_reader, file_path,
-                                                header)
+                                                header, footer)
 
     @classmethod
     def file_type(cls):
@@ -26,13 +26,16 @@ class WallsSurveyWriter(SurveyWriter):
         if self._survey_reader.survey.name:
             first_line = self._survey_reader.survey.name
         f.write(";%s\n" % first_line)
-        f.write(";%s (%s)\n\n" % (os.path.basename(self._survey_reader.file_path), self._survey_reader.file_type()))
 
         if self._header:
+            f.write("\n")
             header_lines = self._header.splitlines()
             for header_line in header_lines:
                 f.write(";%s\n" % header_line.strip())
             f.write("\n")
+
+        f.write(";Data imported from: %s (%s)\n\n" % (os.path.basename(self._survey_reader.file_path), self._survey_reader.file_type()))
+
 
         f.write(";#PREFIX %s\n" % first_line)
         f.write("#UNITS D=M A=G V=G Order=DAV\n\n")
@@ -100,6 +103,9 @@ class WallsSurveyWriter(SurveyWriter):
                     f.write("\t;%s" % comment)
                 f.write("\n")
             if have_duplicates: self.__write_calculated_shot(f)
+
+        if self._footer:
+            f.write("\n;%s\n" % self._footer)
 
         f.close()
 

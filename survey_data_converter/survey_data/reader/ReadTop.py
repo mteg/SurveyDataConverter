@@ -223,27 +223,27 @@ def readfile(pockettoponame, dooutline=True, dosideview=True):
         if tfile.read(3) == b'Top':
             #Next Byte should be the version number
             version = struct.unpack('B', tfile.read(1))
-            print('We have a top file version ' + str(version[0]))
-            print('Reading Trips')
+            #print('We have a top file version ' + str(version[0]))
+            #print('Reading Trips')
             trips = fsection(tfile, trip)
-            print('Reading Shots')
+            #print('Reading Shots')
             shots = fsection(tfile, shot)
-            print('Reading Reference points')
+            #print('Reading Reference points')
             references = fsection(tfile, reference)
-            print('Reading Map scales')
+            #print('Reading Map scales')
             mapping(tfile)
-            print('Reading the shot data')
+            #print('Reading the shot data')
             if dooutline | dosideview:
                 outline = drawing(tfile)
                 print('Reading the plan (outline)')
 #                print(trips)
                 if dosideview:
                     sideview = drawing(tfile)
-                    print('Reading elevation (sideview)')
+                    #print('Reading elevation (sideview)')
                     return {'trips': trips, 'shots': shots, 'ref': references,
                             'outline': outline, 'sideview': sideview}
                 return {'trips': trips, 'shots': shots, 'ref': references, 'outline': outline}
             return {'trips': trips, 'shots': shots, 'ref': references}
         else:
             #need to raise an error here really
-            print('Not a top file')
+            return {}

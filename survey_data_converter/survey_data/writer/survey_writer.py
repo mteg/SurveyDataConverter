@@ -9,9 +9,10 @@ from ..data import *
 class SurveyWriter(object):
     __metaclass__ = ABCMeta
 
-    def __init__(self, survey_reader, file_path, header):
+    def __init__(self, survey_reader, file_path, header, footer = ""):
         super(SurveyWriter, self).__init__()
         self._header = header.strip()
+        self._footer = footer.strip()
         self._survey_reader = survey_reader
         self._write_data(file_path)
 

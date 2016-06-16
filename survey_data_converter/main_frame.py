@@ -9,8 +9,11 @@ import wx
 import wx.lib.agw.persist as PERSIST
 
 from .info import (
-    __appname__
+    __appname__,
+    __projecturl__
 )
+
+from .version import __version__
 
 from survey_data import SurveyReader, SurveyWriter
 
@@ -126,7 +129,10 @@ http://opendatacommons.org/licenses/by/1.0/"""
                                          style=wx.FD_SAVE |
                                                wx.FD_OVERWRITE_PROMPT)
         if save_file_dialog.ShowModal() == wx.ID_OK:
-            writer(self._file_reader, save_file_dialog.GetPath(), header)
+            footer = "Created with %s v%s (%s)" % (
+                __appname__, __version__, __projecturl__)
+            writer(self._file_reader, save_file_dialog.GetPath(), header,
+                   footer)
             alert = wx.MessageDialog(self, self.ALERT_FINISHED_MESSAGE,
                                      self.ALERT_FINISHED_CAPTION,
                                      wx.OK | wx.ICON_INFORMATION)

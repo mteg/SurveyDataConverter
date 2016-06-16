@@ -13,7 +13,7 @@ from __future__ import unicode_literals
 
 __author__ = 'Arkadiusz Młynarczyk'
 __contact__ = 'arek@mlynarczyk.info'
-__projecturl__ = 'tobefilled'
+__projecturl__ = 'http://github.com/amlynarczyk/SurveyDataConverter'
 
 __appname__ = 'Survery Data Converter'
 __license__ = 'MIT'
