@@ -78,7 +78,7 @@ http://opendatacommons.org/licenses/by/1.0/"""
                                              name="AddLicense")
         self._license_checkbox.SetValue(True)
         self._license_textfield = wx.TextCtrl(self._panel,
-                                              style=wx.TE_MULTILINE | wx.TE_DONTWRAP | wx.HSCROLL,
+                                              style=wx.TE_MULTILINE,
                                               size=(-1, 60),
                                               name="LicenseText")
         self._license_textfield.SetValue(self.LICENSE_TEXT)
