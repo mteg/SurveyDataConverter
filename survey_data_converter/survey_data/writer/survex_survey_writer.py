@@ -78,7 +78,7 @@ class SurvexSurveyWriter(SurveyWriter):
             f.write(";*instrument compass \"DistoX\"\n")
             f.write(";*instrument clino \"DistoX\"\n\n")
 
-            f.write("*units tape metres\n*units compass clino deg\n")
+            f.write("*units tape meters\n*units compass clino deg\n")
             f.write("*data normal from to tape compass clino\n\n")
 
             for data in trip.data:
