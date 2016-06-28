@@ -56,7 +56,7 @@ class WallsSurveyWriter(SurveyWriter):
                 date_string = trip.date.strftime("%Y-%m-%d")
                 f.write("#DATE %s\n\n" % date_string)
             else:
-                f.write(";#DATE MISSING!!!\n\n")
+                f.write(";#DATE <YYYY-MM-DD>\n\n")
 
             if trip.comment:
                 f.write(";Comment from file:\n")

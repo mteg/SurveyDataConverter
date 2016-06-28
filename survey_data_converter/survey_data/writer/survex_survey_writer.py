@@ -62,7 +62,7 @@ class SurvexSurveyWriter(SurveyWriter):
                 date_string = trip.date.strftime("%Y.%m.%d")
                 f.write("*date %s\n\n" % date_string)
             else:
-                f.write(";#*date MISSING!!!\n\n")
+                f.write(";#*date <YYYY.MM.DD>\n\n")
 
             if trip.comment:
                 f.write(";Comment from file:\n")
@@ -71,9 +71,11 @@ class SurvexSurveyWriter(SurveyWriter):
                     f.write(";%s\n" % comment_line.strip())
                 f.write("\n")
 
-            f.write(";*team \"PERSON NAME\" tape\n")
-            f.write(";*team \"PERSON NAME\" compass\n")
-            f.write(";*team \"PERSON NAME\" clino\n")
+            f.write(";*export <STATION>\n*entrance <STATION>\n\n")
+
+            f.write(";*team \"<PERSON NAME>\" tape\n")
+            f.write(";*team \"<PERSON NAME>\" compass\n")
+            f.write(";*team \"<PERSON NAME>\" clino\n")
             f.write(";*instrument tape \"DistoX\"\n")
             f.write(";*instrument compass \"DistoX\"\n")
             f.write(";*instrument clino \"DistoX\"\n\n")
