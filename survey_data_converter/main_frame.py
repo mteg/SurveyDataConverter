@@ -71,7 +71,8 @@ http://opendatacommons.org/licenses/by/1.0/"""
         self._writers_panel = wx.RadioBox(self._panel, label="Convert to:",
                                           majorDimension=1,
                                           choices=writer_types,
-                                          style=wx.RA_SPECIFY_ROWS)
+                                          style=wx.RA_SPECIFY_ROWS,
+                                          name="SelectedWriter")
 
         self._license_checkbox = wx.CheckBox(self._panel, style=wx.CHK_2STATE,
                                              label=self.LICENSE_LABEL_TEXT,
@@ -104,6 +105,7 @@ http://opendatacommons.org/licenses/by/1.0/"""
     def _register_and_restore(self):
         mgr = PERSIST.PersistenceManager.Get()
         mgr.RegisterAndRestore(self)
+        mgr.RegisterAndRestore(self._writers_panel)
         mgr.RegisterAndRestore(self._license_checkbox)
         mgr.RegisterAndRestore(self._license_textfield)
         self.Fit()

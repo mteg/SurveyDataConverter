@@ -14,7 +14,7 @@ class WallsSurveyWriter(SurveyWriter):
 
     @classmethod
     def file_type(cls):
-        return "Walls Survey"
+        return "Walls"
 
     @classmethod
     def file_extension(cls):
