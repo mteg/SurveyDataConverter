@@ -71,25 +71,30 @@ class SurvexSurveyWriter(SurveyWriter):
                     f.write(";%s\n" % comment_line.strip())
                 f.write("\n")
 
-            f.write(";*export <STATION>\n*entrance <STATION>\n\n")
+            f.write(";*export <STATION>\n;*entrance <STATION>\n\n")
 
-            f.write(";*team \"<PERSON NAME>\" tape\n")
-            f.write(";*team \"<PERSON NAME>\" compass\n")
-            f.write(";*team \"<PERSON NAME>\" clino\n")
-            f.write(";*instrument tape \"DistoX\"\n")
-            f.write(";*instrument compass \"DistoX\"\n")
-            f.write(";*instrument clino \"DistoX\"\n\n")
+            f.write(";*team \"<PERSON NAME>\" tape compass clino\n")
+            f.write(";*team \"<PERSON NAME>\" notes pictures\n")
+            f.write(";*team \"<PERSON NAME>\" assistant\n")
+            f.write(";*instrument tape compass clino \"DistoX\"\n\n")
 
-            f.write("*units tape meters\n*units compass clino deg\n")
+            f.write("*units tape meters\n*units compass clino degrees\n")
             f.write("*data normal from to tape compass clino\n\n")
 
             for data in trip.data:
+                fromSt = data.fromSt.replace(".", "_")
                 toSt = data.toSt
-                if not toSt: toSt = ".."
+                if not toSt:
+                    toSt = ".."
+                else:
+                    toSt = toSt.replace(".", "_")
+
+                prefix=""
+                if data.tape == 0: prefix = ";"
 
                 f.write(
-                        "%s\t%s\t%0.3f\t%0.2f\t%0.2f" % (
-                            data.fromSt, toSt, data.tape, data.compass,
+                        "%s%s\t%s\t%0.3f\t%0.2f\t%0.2f" % (
+                            prefix, fromSt, toSt, data.tape, data.compass,
                             data.clino))
 
                 comment = data.comment
@@ -100,7 +105,7 @@ class SurvexSurveyWriter(SurveyWriter):
                     f.write("\t;%s" % comment)
                 f.write("\n")
 
-            f.write("\n*end\n")
+            f.write("\n*end %s\n" % survey_name)
 
         if self._footer:
             f.write("\n;%s\n" % self._footer)
