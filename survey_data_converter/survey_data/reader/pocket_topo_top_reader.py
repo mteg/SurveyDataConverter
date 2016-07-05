@@ -58,7 +58,6 @@ class PocketTopoTopReader(SurveyReader):
     def _read_data(self, file_path):
         data = rt.readfile(file_path, False, False)
         # {'trips': trips, 'shots': shots, 'ref': references}
-        trip_idx = 0
         for rtrip in data['trips']:
             #{'date': tdate, 'comment': comment, 'dec': dec}
             trip = Trip()
@@ -68,8 +67,7 @@ class PocketTopoTopReader(SurveyReader):
                 trip.date = datetime.datetime.fromtimestamp(time.mktime(rtrip['date']))
             if 'dec' in rtrip and rtrip['dec']:
                 trip.declination = rtrip['dec']
-            self.survey.trips[trip_idx] = trip
-            trip_idx += 1
+            self.survey.trips.append(trip)
         for rshoot in data['shots']:
             # {'from', 'to', 'tape', 'compass', 'clino', 'trip', 'direction', 'comment'}
             if not 'trip' in rshoot or rshoot['trip'] < 0: continue

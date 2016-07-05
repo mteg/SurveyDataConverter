@@ -52,7 +52,7 @@ class SurvexSurveyWriter(SurveyWriter):
                 f.write(";%s\n" % header_line.strip())
             f.write("\n")
 
-        f.write(";Data imported from: %s (%s)\n\n" % (
+        f.write(";Data imported from: %s (%s)\n" % (
         os.path.basename(self._survey_reader.file_path),
         self._survey_reader.file_type()))
 
@@ -72,7 +72,7 @@ class SurvexSurveyWriter(SurveyWriter):
             if trip.shots_count == 0:
                 continue
 
-            f.write("*begin %s" % survey_name)
+            f.write("\n*begin %s" % survey_name)
             if trip_count > 1:
                 if not trip.name:
                     trip_number = trip_number + 1
@@ -122,7 +122,11 @@ class SurvexSurveyWriter(SurveyWriter):
 
                 comment = data.comment
                 comment = (" ".join(comment.splitlines())).strip()
-                if data.tape == 0: comment = "Connecting shot; " + comment
+                if data.tape == 0:
+                    if data.toSt:
+                        comment = "Connecting shot; " + comment
+                    else:
+                        comment = "Continuation shot; " + comment
                 comment = comment.strip(' ;').strip()
                 if comment:
                     f.write("\t;%s" % comment)

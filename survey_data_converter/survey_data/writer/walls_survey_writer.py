@@ -111,6 +111,9 @@ class WallsSurveyWriter(SurveyWriter):
                         prefix = ";"
 
                 toSt = data.toSt
+
+                if data.tape == 0: prefix = ";"
+
                 if not toSt: toSt = "-"
 
                 f.write(
@@ -120,7 +123,11 @@ class WallsSurveyWriter(SurveyWriter):
 
                 comment = data.comment
                 comment = (" ".join(comment.splitlines())).strip()
-                if data.tape == 0: comment = "Connecting shot; " + comment
+                if data.tape == 0:
+                    if data.toSt:
+                        comment = "Connecting shot; " + comment
+                    else:
+                        comment = "Continuation shot; " + comment
                 comment = comment.strip(' ;').strip()
                 if comment:
                     f.write("\t;%s" % comment)
