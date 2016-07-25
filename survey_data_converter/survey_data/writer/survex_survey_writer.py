@@ -31,9 +31,9 @@ import os
 
 
 class SurvexSurveyWriter(SurveyWriter):
-    def __init__(self, survey_reader, file_path, header, footer = ""):
+    def __init__(self, survey_reader, file_path, header, footer=""):
         super(SurvexSurveyWriter, self).__init__(survey_reader, file_path,
-                                                header, footer)
+                                                 header, footer)
 
     @classmethod
     def file_type(cls):
@@ -53,14 +53,13 @@ class SurvexSurveyWriter(SurveyWriter):
             f.write("\n")
 
         f.write(";Data imported from: %s (%s)\n" % (
-        os.path.basename(self._survey_reader.file_path),
-        self._survey_reader.file_type()))
+            os.path.basename(self._survey_reader.file_path),
+            self._survey_reader.file_type()))
 
-        survey_name = os.path.splitext(os.path.basename(self._survey_reader.file_path))[0]
+        survey_name = \
+        os.path.splitext(os.path.basename(self._survey_reader.file_path))[0]
         if self._survey_reader.survey.name:
             survey_name = self._survey_reader.survey.name
-
-
 
         trip_count = len(self._survey_reader.survey.trips)
         for trip in self._survey_reader.survey.trips:
@@ -105,6 +104,7 @@ class SurvexSurveyWriter(SurveyWriter):
             f.write("*data normal from to tape compass clino\n\n")
 
             for data in trip.data:
+                additional_line = ''
                 fromSt = data.fromSt.replace(".", "_")
                 toSt = data.toSt
                 if not toSt:
@@ -112,25 +112,30 @@ class SurvexSurveyWriter(SurveyWriter):
                 else:
                     toSt = toSt.replace(".", "_")
 
-                prefix=""
+                prefix = ""
                 if data.tape == 0: prefix = ";"
+                if data.tape == 0 and data.toSt:  prefix = "\n" + prefix;
 
                 f.write(
-                        "%s%s\t%s\t%0.3f\t%0.2f\t%0.2f" % (
-                            prefix, fromSt, toSt, data.tape, data.compass,
-                            data.clino))
+                    "%s%s\t%s\t%0.3f\t%0.2f\t%0.2f" % (
+                        prefix, fromSt, toSt, data.tape, data.compass,
+                        data.clino))
 
                 comment = data.comment
                 comment = (" ".join(comment.splitlines())).strip()
                 if data.tape == 0:
                     if data.toSt:
                         comment = "Connecting shot; " + comment
+                        additional_line = ';*equate %s\t%s\t;Generated automatically\n\n' % (
+                            fromSt, toSt)
                     else:
                         comment = "Continuation shot; " + comment
                 comment = comment.strip(' ;').strip()
                 if comment:
                     f.write("\t;%s" % comment)
                 f.write("\n")
+                if additional_line:
+                    f.write(additional_line)
 
             f.write("\n*end %s\n" % survey_name)
 

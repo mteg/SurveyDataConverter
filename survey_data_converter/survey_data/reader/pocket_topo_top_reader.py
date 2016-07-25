@@ -71,7 +71,7 @@ class PocketTopoTopReader(SurveyReader):
         for rshoot in data['shots']:
             # {'from', 'to', 'tape', 'compass', 'clino', 'trip', 'direction', 'comment'}
             if not 'trip' in rshoot or rshoot['trip'] < 0: continue
-            trip = self.survey.trips[rshoot['trip']]
+            trip = self.survey.trips[rshoot['trip']+1]
             data_line = DataLine()
             if 'from' in rshoot:
                 data_line.fromSt = rshoot['from']
