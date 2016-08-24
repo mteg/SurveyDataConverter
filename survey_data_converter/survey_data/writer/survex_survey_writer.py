@@ -137,7 +137,13 @@ class SurvexSurveyWriter(SurveyWriter):
                 if additional_line:
                     f.write(additional_line)
 
-            f.write("\n*end %s\n" % survey_name)
+            f.write("\n*end %s" % survey_name)
+            if trip_count > 1:
+                if not trip.name:
+                    f.write("-%d" % trip_number)
+                else:
+                    f.write("-%s" & trip.name)
+            f.write("\n")
 
         if self._footer:
             f.write("\n;%s\n" % self._footer)
