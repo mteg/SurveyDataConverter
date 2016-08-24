@@ -67,14 +67,6 @@ class WallsSurveyWriter(SurveyWriter):
             if trip.shots_count == 0:
                 continue
 
-            have_duplicates = False
-            p = DataLine()
-            for data in trip.data:
-                if p.toSt and data.toSt and p.toSt == data.toSt:
-                    have_duplicates = True
-                    break
-                p = data
-
             if trip.date:
                 date_string = trip.date.strftime("%Y-%m-%d")
                 f.write("#DATE %s\n\n" % date_string)
@@ -88,27 +80,9 @@ class WallsSurveyWriter(SurveyWriter):
                     f.write(";%s\n" % comment_line.strip())
                 f.write("\n")
 
-            if have_duplicates:
-                self.__previous_data = DataLine()
-                self.__tape = []
-                self.__compass = []
-                self.__clino = []
-
-            for data in trip.data:
+            dedup_data = self.deduplicate(trip.data)
+            for data in dedup_data:
                 prefix = ""
-                if have_duplicates:
-                    if not data.toSt or (
-                                    data.fromSt !=
-                                    self.__previous_data.fromSt or data.toSt
-                                != self.__previous_data.toSt):
-                        self.__write_calculated_shot(f)
-                    self.__previous_data = data
-
-                    if data.toSt and data.tape != 0:
-                        self.__tape.append(data.tape)
-                        self.__compass.append(data.compass)
-                        self.__clino.append(data.clino)
-                        prefix = ";"
 
                 toSt = data.toSt
 
@@ -132,31 +106,9 @@ class WallsSurveyWriter(SurveyWriter):
                 if comment:
                     f.write("\t;%s" % comment)
                 f.write("\n")
-            if have_duplicates: self.__write_calculated_shot(f)
 
         if self._footer:
             f.write("\n;%s\n" % self._footer)
 
         f.close()
 
-    def __write_calculated_shot(self, f):
-        if len(self.__tape) == 0:
-            return
-        calculated_tape = sum(self.__tape) / len(self.__tape)
-        if calculated_tape == 0: return
-        calculated_clino = sum(self.__clino) / len(self.__clino)
-        x = 0
-        y = 0
-        for angle in self.__compass:
-            x += math.cos(math.radians(angle))
-            y += math.sin(math.radians(angle))
-        calculated_compass = math.degrees(math.atan2(y, x)) % 360
-        if calculated_compass == 360: calculated_compass = 0
-        f.write(
-            "%s\t%s\t%0.3f\t%0.2f\t%0.2f\t;Calculated from shots above\n" % (
-                self.__previous_data.fromSt, self.__previous_data.toSt,
-                calculated_tape, calculated_compass,
-                calculated_clino))
-        self.__tape = []
-        self.__compass = []
-        self.__clino = []

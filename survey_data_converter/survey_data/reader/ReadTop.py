@@ -47,6 +47,17 @@ def comments(F):
         clen = commentlength[0]
     #print(clen)
     C = F.read(clen)
+    
+    if clen == 0:
+        return ""
+    
+    # Test if it's not DistoX2 sensor readouts 
+    if C[0] == "{":
+        i = 1 
+        while i < clen and C[i] <> "}":
+            i += 1
+        if i < clen:
+            C = C[(i + 1):]
     return str(C)
     #In python 3
     #return str(C,'utf-8')
@@ -103,6 +114,7 @@ def shot(F):
         thline['direction'] = '>'
     if (flags[0] & 0b00000010) == 0b000000010:
         thline['comment'] = comments(F)
+    
     return thline
 
 

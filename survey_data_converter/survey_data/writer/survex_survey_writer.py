@@ -103,7 +103,8 @@ class SurvexSurveyWriter(SurveyWriter):
             f.write("*units tape meters\n*units compass clino degrees\n")
             f.write("*data normal from to tape compass clino\n\n")
 
-            for data in trip.data:
+            dedup_data = self.deduplicate(trip.data)
+            for data in dedup_data:
                 additional_line = ''
                 fromSt = data.fromSt.replace(".", "_")
                 toSt = data.toSt
@@ -126,7 +127,7 @@ class SurvexSurveyWriter(SurveyWriter):
                 if data.tape == 0:
                     if data.toSt:
                         comment = "Connecting shot; " + comment
-                        additional_line = ';*equate %s\t%s\t;Generated automatically\n\n' % (
+                        additional_line = '*equate %s\t%s\t;Generated automatically\n\n' % (
                             fromSt, toSt)
                     else:
                         comment = "Continuation shot; " + comment
